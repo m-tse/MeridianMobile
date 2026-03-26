@@ -6,7 +6,7 @@
 
 ## Overview
 
-Time Zones is an iOS app developed by ImprovMX Incorporated. Your privacy is important to us.
+Your privacy is important to us.
 
 ## Data Collection
 
@@ -22,4 +22,4 @@ All data stays on your device.
 
 ## Contact
 
-If you have questions about this privacy policy, contact us at support@improvmx.com.
+If you have questions about this privacy policy, contact us at matt.s.tse@gmail.com.
