@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct DayNightBar: View {
     let timeZone: TimeZone
@@ -22,7 +23,7 @@ struct DayNightBar: View {
                     let tickH: CGFloat = isMajorMark ? 14 : (isHourMark ? 9 : 5)
                     let tickW: CGFloat = 1.0
                     let isDaytime = hour >= 6 && hour <= 18
-                    let tickColor = isDaytime ? Color.orange : Color(white: 0.3)
+                    let tickColor = isDaytime ? Color.orange : Color(uiColor: UIColor { $0.userInterfaceStyle == .dark ? UIColor(white: 0.4, alpha: 1) : .black })
 
                     Rectangle()
                         .fill(tickColor)
