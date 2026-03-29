@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var showingAdd = false
     @State private var showingDatePicker = false
     @State private var pickerDate = Date()
+    @State private var pickerTimeZone = TimeZone.current
     @State private var renamingTimezone: WorldTimezone? = nil
     @State private var renameText = ""
 
@@ -29,6 +30,7 @@ struct ContentView: View {
                                 hourOffset: $store.hourOffset,
                                 isHighlighted: isReference,
                                 onDateTap: {
+                                    pickerTimeZone = tz.timeZone
                                     pickerDate = selectedDate
                                     showingDatePicker = true
                                 }
@@ -107,11 +109,25 @@ struct ContentView: View {
                     VStack {
                         DatePicker("", selection: $pickerDate, displayedComponents: .date)
                             .datePickerStyle(.graphical)
+                            .environment(\.timeZone, pickerTimeZone)
                             .padding(.horizontal, 16)
                             .onChange(of: pickerDate) { newDate in
                                 let now = Date()
-                                let diff = newDate.timeIntervalSince(now) / 3600.0
-                                store.hourOffset = (diff * 60).rounded() / 60
+                                var refCal = Calendar.current
+                                refCal.timeZone = pickerTimeZone
+                                let pickedComps = refCal.dateComponents([.year, .month, .day], from: newDate)
+                                let timeComps = refCal.dateComponents([.hour, .minute, .second], from: selectedDate)
+                                var target = DateComponents()
+                                target.year = pickedComps.year
+                                target.month = pickedComps.month
+                                target.day = pickedComps.day
+                                target.hour = timeComps.hour
+                                target.minute = timeComps.minute
+                                target.second = timeComps.second
+                                if let targetDate = refCal.date(from: target) {
+                                    let diff = targetDate.timeIntervalSince(now) / 3600.0
+                                    store.hourOffset = (diff * 60).rounded() / 60
+                                }
                             }
 
                         Button("Today") {
