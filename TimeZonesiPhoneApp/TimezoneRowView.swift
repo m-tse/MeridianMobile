@@ -15,14 +15,14 @@ struct TimezoneRowView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(timezone.label)
-                            .font(.system(size: 17, weight: isHighlighted ? .bold : .medium))
+                            .font(.system(size: 20, weight: isHighlighted ? .bold : .medium))
                     }
                     HStack(spacing: 8) {
                         Text(abbreviation)
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 14))
+                            .foregroundColor(Color(white: 0.3))
                         Text(formattedDate)
-                            .font(.system(size: 12))
+                            .font(.system(size: 14))
                             .foregroundColor(dateColor)
                             .underline(color: dateColor.opacity(0.5))
                             .onTapGesture {
@@ -30,7 +30,7 @@ struct TimezoneRowView: View {
                             }
                         if hourDelta != 0 {
                             Text(hourDeltaLabel)
-                                .font(.system(size: 12))
+                                .font(.system(size: 14))
                                 .foregroundColor(hourDelta > 0 ? Color(red: 0.0, green: 0.47, blue: 0.0) : Color(red: 0.78, green: 0.0, blue: 0.0))
                         }
                     }
@@ -38,15 +38,15 @@ struct TimezoneRowView: View {
                 Spacer()
                 HStack(spacing: 0) {
                     Text(timeHour)
-                        .font(.system(size: 34, weight: .medium, design: .rounded))
+                        .font(.system(size: 38, weight: .medium, design: .rounded))
                         .monospacedDigit()
                     Text(":")
-                        .font(.system(size: 34, weight: .medium, design: .rounded))
+                        .font(.system(size: 38, weight: .medium, design: .rounded))
                         .monospacedDigit()
                         .opacity(colonVisible ? 1 : 0.15)
                         .offset(y: -1.5)
                     Text(timeMinuteAndPeriod)
-                        .font(.system(size: 34, weight: .medium, design: .rounded))
+                        .font(.system(size: 38, weight: .medium, design: .rounded))
                         .monospacedDigit()
                 }
             }
@@ -54,7 +54,7 @@ struct TimezoneRowView: View {
             DayNightBar(timeZone: timezone.timeZone, selectedDate: selectedDate, hourOffset: $hourOffset)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.vertical, 14)
         .contentShape(Rectangle())
         .background(isHighlighted ? Color.accentColor.opacity(0.12) : Color.clear)
         .onAppear {
@@ -109,7 +109,7 @@ struct TimezoneRowView: View {
 
     private var formattedDate: String {
         let fmt = DateFormatter()
-        fmt.dateFormat = "MMM d"
+        fmt.dateFormat = "EEE MMM d"
         fmt.timeZone = timezone.timeZone
         return fmt.string(from: selectedDate)
     }
@@ -118,7 +118,7 @@ struct TimezoneRowView: View {
         let diff = dayOffset
         if diff < 0 { return Color(red: 0.78, green: 0.0, blue: 0.0) }
         if diff > 0 { return Color(red: 0.0, green: 0.47, blue: 0.0) }
-        return .secondary
+        return Color(white: 0.3)
     }
 
     private var dayOffset: Int {
