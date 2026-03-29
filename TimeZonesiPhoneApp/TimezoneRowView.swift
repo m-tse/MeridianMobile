@@ -8,6 +8,7 @@ struct TimezoneRowView: View {
     var isHighlighted: Bool = false
     var onDateTap: (() -> Void)? = nil
     @State private var colonVisible = true
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -20,7 +21,7 @@ struct TimezoneRowView: View {
                     HStack(spacing: 8) {
                         Text(abbreviation)
                             .font(.system(size: 14))
-                            .foregroundColor(Color(white: 0.3))
+                            .foregroundColor(colorScheme == .dark ? Color(white: 0.6) : Color(white: 0.3))
                         Text(formattedDate)
                             .font(.system(size: 14))
                             .foregroundColor(dateColor)
@@ -31,7 +32,7 @@ struct TimezoneRowView: View {
                         if hourDelta != 0 {
                             Text(hourDeltaLabel)
                                 .font(.system(size: 14))
-                                .foregroundColor(hourDelta > 0 ? Color(red: 0.0, green: 0.47, blue: 0.0) : Color(red: 0.78, green: 0.0, blue: 0.0))
+                                .foregroundColor(hourDelta > 0 ? positiveColor : negativeColor)
                         }
                     }
                 }
@@ -114,11 +115,19 @@ struct TimezoneRowView: View {
         return fmt.string(from: selectedDate)
     }
 
+    private var positiveColor: Color {
+        colorScheme == .dark ? Color(red: 0.2, green: 0.8, blue: 0.2) : Color(red: 0.0, green: 0.47, blue: 0.0)
+    }
+
+    private var negativeColor: Color {
+        colorScheme == .dark ? Color(red: 1.0, green: 0.35, blue: 0.35) : Color(red: 0.78, green: 0.0, blue: 0.0)
+    }
+
     private var dateColor: Color {
         let diff = dayOffset
-        if diff < 0 { return Color(red: 0.78, green: 0.0, blue: 0.0) }
-        if diff > 0 { return Color(red: 0.0, green: 0.47, blue: 0.0) }
-        return Color(white: 0.3)
+        if diff < 0 { return negativeColor }
+        if diff > 0 { return positiveColor }
+        return colorScheme == .dark ? Color(white: 0.6) : Color(white: 0.3)
     }
 
     private var dayOffset: Int {
