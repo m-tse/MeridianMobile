@@ -55,7 +55,7 @@ struct TimezoneRowView: View {
             DayNightBar(timeZone: timezone.timeZone, selectedDate: selectedDate, hourOffset: $hourOffset)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
+        .padding(.vertical, 11)
         .contentShape(Rectangle())
         .background(isHighlighted ? Color.accentColor.opacity(0.12) : Color.clear)
         .onAppear {
