@@ -2,6 +2,8 @@
 
 An iOS app for viewing multiple timezones at a glance — the iPhone companion to [TimeZonesMenuBarApp](https://github.com/m-tse/TimeZonesMenuBarApp).
 
+[Download on the App Store](https://apps.apple.com/app/time-zone-visualizer/id6761193852)
+
 ## Why
 
 Most timezone apps just show you the current time in different cities. That's not very useful — you can Google that. What you actually need is to answer questions like "if I schedule a call for 3pm my time, what time is that for them?" or "what time was it in Tokyo when that incident fired at 2am?" This app lets you drag a time ruler and see all your cities update simultaneously, so you can scrub forward or backward through the day and instantly see the answer.
