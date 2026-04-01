@@ -25,6 +25,19 @@ It's also designed to be dead simple to read. Day and night hours are visually d
 
 - iOS 16.0 or later
 
+## App Store Release (CLI)
+
+- **Bundle ID**: `com.matthewtse.timezones`
+- **Team ID**: `2TMRXZB6JT`
+- **App Store Connect API Key ID**: `2B3RK28FCF`
+- **App Store Connect Issuer ID**: `c39330f9-3f5e-44d6-abe8-5e3a76d7e014`
+- **Private key location**: `~/.appstoreconnect/private_keys/AuthKey_2B3RK28FCF.p8`
+
+Upload command:
+```bash
+xcrun altool --upload-app -f <ipa> -t ios --apiKey 2B3RK28FCF --apiIssuer c39330f9-3f5e-44d6-abe8-5e3a76d7e014
+```
+
 ## Privacy
 
 See [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
