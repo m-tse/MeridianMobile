@@ -1,6 +1,6 @@
 # Xcode
 build/
-*.xcuserdata
+xcuserdata/
 *.xcworkspace
 DerivedData/
 *.hmap
