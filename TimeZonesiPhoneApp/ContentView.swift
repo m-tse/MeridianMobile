@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var pickerTimeZone = TimeZone.current
     @State private var renamingTimezone: WorldTimezone? = nil
     @State private var renameText = ""
+    @State private var showingSettings = false
 
     let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
@@ -29,6 +30,7 @@ struct ContentView: View {
                                 localTimeZone: store.referenceTimeZone,
                                 hourOffset: $store.hourOffset,
                                 isHighlighted: isReference,
+                                use24Hour: store.use24Hour,
                                 onDateTap: {
                                     pickerTimeZone = tz.timeZone
                                     pickerDate = selectedDate
@@ -92,6 +94,13 @@ struct ContentView: View {
             .navigationTitle("Time Zones")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         showingAdd = true
@@ -103,6 +112,32 @@ struct ContentView: View {
             .sheet(isPresented: $showingAdd) {
                 AddTimezoneView(isShowing: $showingAdd)
                     .environmentObject(store)
+            }
+            .sheet(isPresented: $showingSettings) {
+                NavigationStack {
+                    List {
+                        Section {
+                            Toggle("24-hour time", isOn: $store.use24Hour)
+                        }
+                        Section("Tips") {
+                            Label("Long-press a time zone to rename or delete it", systemImage: "hand.tap")
+                            Label("Double-tap the slider to reset to current time", systemImage: "arrow.uturn.backward")
+                            Label("Tap the date to open a calendar picker", systemImage: "calendar")
+                        }
+                        .font(.system(size: 14))
+                        .foregroundColor(.secondary)
+                    }
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") {
+                                showingSettings = false
+                            }
+                        }
+                    }
+                }
+                .presentationDetents([.medium])
             }
             .sheet(isPresented: $showingDatePicker) {
                 NavigationStack {

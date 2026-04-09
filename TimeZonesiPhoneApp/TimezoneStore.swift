@@ -14,12 +14,16 @@ class TimezoneStore: ObservableObject {
     @Published var timezones: [WorldTimezone] = []
     @Published var hourOffset: Double = 0
     @Published var referenceTimezoneId: String = TimeZone.current.identifier
+    @Published var use24Hour: Bool {
+        didSet { UserDefaults.standard.set(use24Hour, forKey: "worldclock_use24Hour") }
+    }
 
     var referenceTimeZone: TimeZone {
         TimeZone(identifier: referenceTimezoneId) ?? .current
     }
 
     init() {
+        self.use24Hour = UserDefaults.standard.object(forKey: "worldclock_use24Hour") as? Bool ?? true
         if let data = UserDefaults.standard.data(forKey: "worldclock_timezones"),
            let saved = try? JSONDecoder().decode([WorldTimezone].self, from: data) {
             timezones = saved
