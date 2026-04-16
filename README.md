@@ -4,7 +4,7 @@ An iOS app for viewing multiple timezones at a glance — the iPhone companion t
 
 [Download on the App Store](https://apps.apple.com/app/time-zone-visualizer/id6761193852)
 
-![Time Zones iPhone screenshot](iphone_screenshot.webp)
+![Time Zones iPhone screenshot](iphone_screenshot.png)
 
 ## Why
 
