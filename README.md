@@ -31,16 +31,55 @@ It's also designed to be dead simple to read. Day and night hours are visually d
 
 ## App Store Release (CLI)
 
+### Constants
+
 - **Bundle ID**: `com.matthewtse.timezones`
 - **Team ID**: `2TMRXZB6JT`
-- **App Store Connect API Key ID**: `2B3RK28FCF`
+- **App Store Connect API Key ID**: `754SDLX2C5` (Admin role — required for cloud-signed distribution certificates)
 - **App Store Connect Issuer ID**: `c39330f9-3f5e-44d6-abe8-5e3a76d7e014`
-- **Private key location**: `~/.appstoreconnect/private_keys/AuthKey_2B3RK28FCF.p8`
+- **Private key location**: `~/.appstoreconnect/private_keys/AuthKey_754SDLX2C5.p8`
 
-Upload command:
-```bash
-xcrun altool --upload-app -f <ipa> -t ios --apiKey 2B3RK28FCF --apiIssuer c39330f9-3f5e-44d6-abe8-5e3a76d7e014
-```
+The Admin role on the API key is what lets `xcodebuild -allowProvisioningUpdates` create/renew the iOS Distribution certificate without manual Xcode steps. A non-Admin key fails with "Cloud signing permission error / No signing certificate iOS Distribution found".
+
+### Release steps
+
+1. **Bump version** in `TimeZonesiPhoneApp.xcodeproj/project.pbxproj` — both Debug and Release configs:
+   - `MARKETING_VERSION` (e.g. `1.2` → `1.3`)
+   - `CURRENT_PROJECT_VERSION` — must increase every upload (App Store Connect rejects duplicates)
+
+2. **Archive**:
+   ```bash
+   rm -rf build/TimeZonesiPhoneApp.xcarchive build/export
+   xcodebuild -project TimeZonesiPhoneApp.xcodeproj \
+     -scheme TimeZonesiPhoneApp -configuration Release \
+     -destination 'generic/platform=iOS' \
+     -archivePath build/TimeZonesiPhoneApp.xcarchive archive
+   ```
+
+3. **Export + upload** (`ExportOptions.plist` has `destination: upload`, so this single command both exports the IPA and uploads it to App Store Connect):
+   ```bash
+   xcodebuild -exportArchive \
+     -archivePath build/TimeZonesiPhoneApp.xcarchive \
+     -exportOptionsPlist ExportOptions.plist \
+     -exportPath build/export \
+     -allowProvisioningUpdates \
+     -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_754SDLX2C5.p8 \
+     -authenticationKeyID 754SDLX2C5 \
+     -authenticationKeyIssuerID c39330f9-3f5e-44d6-abe8-5e3a76d7e014
+   ```
+
+4. **Commit, tag, push**:
+   ```bash
+   git commit -am "Bump version to X.Y (build N)"
+   git tag vX.Y && git push origin main vX.Y
+   ```
+
+5. **In App Store Connect web UI**: wait for the build to finish processing (5-15 min, you'll get an email), then create a new version, fill in "What's New" release notes, attach the build, and submit for review.
+
+### Pre-release gotchas
+
+- **Agreements**: if `App Store Connect → Business → Agreements` shows any agreement that isn't `Active`, accept it first (`FORBIDDEN.REQUIRED_AGREEMENTS_MISSING_OR_EXPIRED`).
+- **DSA / EU trader compliance**: if `App Store Connect → Business` shows a red Digital Services Act banner, complete it before uploading.
 
 ## Privacy
 
