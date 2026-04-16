@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: TimezoneStore
+    @Environment(\.scenePhase) private var scenePhase
     @State private var now = Date()
     @State private var showingAdd = false
     @State private var showingDatePicker = false
@@ -23,7 +24,7 @@ struct ContentView: View {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(spacing: 0) {
                         ForEach(store.sortedTimezones(for: selectedDate)) { tz in
-                            let isReference = tz.timeZone.identifier == store.referenceTimezoneId
+                            let isReference = tz.identifier == store.referenceTimezoneId
                             TimezoneRowView(
                                 timezone: tz,
                                 selectedDate: selectedDate,
@@ -38,11 +39,11 @@ struct ContentView: View {
                                 }
                             )
                             .onTapGesture {
-                                store.referenceTimezoneId = tz.timeZone.identifier
+                                store.referenceTimezoneId = tz.identifier
                             }
                             .contextMenu {
                                 Button {
-                                    store.referenceTimezoneId = tz.timeZone.identifier
+                                    store.referenceTimezoneId = tz.identifier
                                 } label: {
                                     Label(isReference ? "Reference timezone" : "Set as reference", systemImage: "pin")
                                 }
@@ -77,18 +78,24 @@ struct ContentView: View {
                 Divider()
 
                 // Footer
-                HStack {
-                    Spacer()
-                    Button("Reset") {
-                        withAnimation(.easeOut(duration: 0.3)) {
-                            store.hourOffset = 0
-                        }
+                Button {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        store.hourOffset = 0
                     }
-                    .font(.system(size: 14))
-                    .disabled(store.hourOffset == 0)
-                    .opacity(store.hourOffset != 0 ? 1 : 0.4)
-                    Spacer()
+                } label: {
+                    Text("Reset")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(store.hourOffset != 0 ? .white : .secondary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(store.hourOffset != 0 ? Color.primary.opacity(0.25) : Color.primary.opacity(0.08))
+                        )
                 }
+                .buttonStyle(.plain)
+                .disabled(store.hourOffset == 0)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 10)
             }
             .navigationTitle("Time Zones")
@@ -120,6 +127,7 @@ struct ContentView: View {
                             Toggle("24-hour time", isOn: $store.use24Hour)
                         }
                         Section("Tips") {
+                            Label("Drag the slider horizontally to change time", systemImage: "arrow.left.and.right")
                             Label("Long-press a time zone to rename or delete it", systemImage: "hand.tap")
                             Label("Double-tap the slider to reset to current time", systemImage: "arrow.uturn.backward")
                             Label("Tap the date to open a calendar picker", systemImage: "calendar")
@@ -203,6 +211,11 @@ struct ContentView: View {
         }
         .onReceive(timer) { _ in
             now = Date()
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active {
+                now = Date()
+            }
         }
     }
 }

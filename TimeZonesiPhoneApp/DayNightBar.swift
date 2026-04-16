@@ -45,43 +45,42 @@ struct DayNightBar: View {
                     .foregroundColor(Color(white: 0.35))
                 }
                 .frame(width: markerSize, height: markerSize)
+                .contentShape(Circle())
                 .position(x: clampedX, y: totalHeight / 2)
-            }
-            .frame(height: totalHeight)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        let fraction = max(0, min(value.location.x / geo.size.width, 1.0))
-                        let targetHour = fraction * 24.0
+                .gesture(
+                    DragGesture(minimumDistance: 0, coordinateSpace: .named("daynightbar"))
+                        .onChanged { value in
+                            let fraction = max(0, min(value.location.x / geo.size.width, 1.0))
+                            let targetHour = fraction * 24.0
 
-                        // Get the currently displayed date's start-of-day in this timezone
-                        var cal = Calendar.current
-                        cal.timeZone = timeZone
-                        let dayStart = cal.startOfDay(for: selectedDate)
+                            var cal = Calendar.current
+                            cal.timeZone = timeZone
+                            let dayStart = cal.startOfDay(for: selectedDate)
 
-                        // Build target date: same day, but at the dragged hour
-                        let targetDate = dayStart.addingTimeInterval(targetHour * 3600)
+                            let targetDate = dayStart.addingTimeInterval(targetHour * 3600)
 
-                        let now = Date()
-                        let diff = targetDate.timeIntervalSince(now) / 3600.0
-                        hourOffset = (diff * 60).rounded() / 60 // snap to 1 minute
-                    }
-                    .onEnded { value in
-                        let distance = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2))
-                        if distance < 5 {
                             let now = Date()
-                            if now.timeIntervalSince(lastTapTime) < 0.3 {
-                                withAnimation(.easeOut(duration: 0.3)) {
-                                    hourOffset = 0
+                            let diff = targetDate.timeIntervalSince(now) / 3600.0
+                            hourOffset = (diff * 60).rounded() / 60
+                        }
+                        .onEnded { value in
+                            let distance = sqrt(pow(value.translation.width, 2) + pow(value.translation.height, 2))
+                            if distance < 5 {
+                                let now = Date()
+                                if now.timeIntervalSince(lastTapTime) < 0.3 {
+                                    withAnimation(.easeOut(duration: 0.3)) {
+                                        hourOffset = 0
+                                    }
+                                    lastTapTime = .distantPast
+                                } else {
+                                    lastTapTime = now
                                 }
-                                lastTapTime = .distantPast
-                            } else {
-                                lastTapTime = now
                             }
                         }
-                    }
-            )
+                )
+            }
+            .frame(height: totalHeight)
+            .coordinateSpace(name: "daynightbar")
         }
         .frame(height: totalHeight)
     }

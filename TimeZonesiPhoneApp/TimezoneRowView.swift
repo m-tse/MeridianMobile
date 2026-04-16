@@ -51,6 +51,7 @@ struct TimezoneRowView: View {
                         .font(.system(size: 38, weight: .medium, design: .rounded))
                         .monospacedDigit()
                 }
+                .foregroundColor(timeColor)
             }
 
             DayNightBar(timeZone: timezone.timeZone, selectedDate: selectedDate, hourOffset: $hourOffset)
@@ -133,6 +134,13 @@ struct TimezoneRowView: View {
         if diff < 0 { return negativeColor }
         if diff > 0 { return positiveColor }
         return colorScheme == .dark ? Color(white: 0.6) : Color(white: 0.3)
+    }
+
+    private var timeColor: Color {
+        let diff = dayOffset
+        if diff < 0 { return negativeColor }
+        if diff > 0 { return positiveColor }
+        return .primary
     }
 
     private var dayOffset: Int {
