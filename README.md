@@ -1,6 +1,6 @@
 # Time Zones (iOS)
 
-An iOS app for viewing multiple timezones at a glance — the iPhone companion to [TimeZonesMenuBarApp](https://github.com/m-tse/TimeZonesMenuBarApp).
+An iOS app for viewing multiple timezones at a glance — the iPhone companion to [TimeZonesMacOS](https://github.com/m-tse/TimeZonesMacOS).
 
 [Download on the App Store](https://apps.apple.com/app/time-zone-visualizer/id6761193852)
 
