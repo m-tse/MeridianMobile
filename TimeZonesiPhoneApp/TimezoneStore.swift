@@ -1,12 +1,52 @@
 import SwiftUI
+import UIKit
 
 struct WorldTimezone: Identifiable, Codable, Equatable {
     let identifier: String
     var label: String
+    var backgroundColorHex: String?
     var id: String { identifier }
 
     var timeZone: TimeZone {
         TimeZone(identifier: identifier) ?? .current
+    }
+
+    var backgroundColor: Color? {
+        guard let hex = backgroundColorHex else { return nil }
+        return Color(hex: hex)
+    }
+}
+
+extension Color {
+    init?(hex: String) {
+        var s = hex
+        if s.hasPrefix("#") { s.removeFirst() }
+        guard let val = UInt64(s, radix: 16) else { return nil }
+        switch s.count {
+        case 6:
+            let r = Double((val >> 16) & 0xff) / 255
+            let g = Double((val >> 8) & 0xff) / 255
+            let b = Double(val & 0xff) / 255
+            self = Color(.sRGB, red: r, green: g, blue: b, opacity: 1)
+        case 8:
+            let r = Double((val >> 24) & 0xff) / 255
+            let g = Double((val >> 16) & 0xff) / 255
+            let b = Double((val >> 8) & 0xff) / 255
+            let a = Double(val & 0xff) / 255
+            self = Color(.sRGB, red: r, green: g, blue: b, opacity: a)
+        default:
+            return nil
+        }
+    }
+
+    func toHexString() -> String? {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard UIColor(self).getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
+        let ri = Int((r * 255).rounded())
+        let gi = Int((g * 255).rounded())
+        let bi = Int((b * 255).rounded())
+        let ai = Int((a * 255).rounded())
+        return String(format: "#%02X%02X%02X%02X", ri, gi, bi, ai)
     }
 }
 
@@ -16,6 +56,20 @@ class TimezoneStore: ObservableObject {
     @Published var referenceTimezoneId: String = TimeZone.current.identifier
     @Published var use24Hour: Bool {
         didSet { UserDefaults.standard.set(use24Hour, forKey: "worldclock_use24Hour") }
+    }
+    @Published var referenceHighlightHex: String? = UserDefaults.standard.string(forKey: "worldclock_referenceHighlight") {
+        didSet {
+            if let h = referenceHighlightHex {
+                UserDefaults.standard.set(h, forKey: "worldclock_referenceHighlight")
+            } else {
+                UserDefaults.standard.removeObject(forKey: "worldclock_referenceHighlight")
+            }
+        }
+    }
+
+    var referenceHighlightColor: Color {
+        if let hex = referenceHighlightHex, let c = Color(hex: hex) { return c }
+        return Color.accentColor.opacity(0.12)
     }
 
     var referenceTimeZone: TimeZone {
@@ -67,6 +121,13 @@ class TimezoneStore: ObservableObject {
     func rename(_ tz: WorldTimezone, to newLabel: String) {
         if let idx = timezones.firstIndex(where: { $0.identifier == tz.identifier }) {
             timezones[idx].label = newLabel
+            save()
+        }
+    }
+
+    func setBackgroundColor(_ tz: WorldTimezone, hex: String?) {
+        if let idx = timezones.firstIndex(where: { $0.identifier == tz.identifier }) {
+            timezones[idx].backgroundColorHex = hex
             save()
         }
     }

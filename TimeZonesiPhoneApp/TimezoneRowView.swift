@@ -6,6 +6,7 @@ struct TimezoneRowView: View {
     let localTimeZone: TimeZone
     @Binding var hourOffset: Double
     var isHighlighted: Bool = false
+    var highlightColor: Color = Color.accentColor.opacity(0.12)
     var use24Hour: Bool = true
     var onDateTap: (() -> Void)? = nil
     @State private var colonVisible = true
@@ -39,7 +40,13 @@ struct TimezoneRowView: View {
                 }
                 Spacer()
                 HStack(spacing: 0) {
-                    Text(timeHour)
+                    let firstDigit = String(timeHour.prefix(1))
+                    let restDigits = String(timeHour.dropFirst())
+                    Text(firstDigit)
+                        .font(.system(size: 38, weight: .medium, design: .rounded))
+                        .monospacedDigit()
+                        .opacity(!use24Hour && firstDigit == "0" ? 0 : 1)
+                    Text(restDigits)
                         .font(.system(size: 38, weight: .medium, design: .rounded))
                         .monospacedDigit()
                     Text(":")
@@ -59,7 +66,16 @@ struct TimezoneRowView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 11)
         .contentShape(Rectangle())
-        .background(isHighlighted ? Color.accentColor.opacity(0.12) : Color.clear)
+        .background(
+            ZStack {
+                if let custom = timezone.backgroundColor {
+                    custom
+                }
+                if isHighlighted {
+                    highlightColor
+                }
+            }
+        )
         .onAppear {
             withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                 colonVisible = false
@@ -80,7 +96,7 @@ struct TimezoneRowView: View {
 
     private var timeHour: String {
         let fmt = DateFormatter()
-        fmt.dateFormat = use24Hour ? "HH" : "h"
+        fmt.dateFormat = use24Hour ? "HH" : "hh"
         fmt.timeZone = timezone.timeZone
         return fmt.string(from: selectedDate)
     }
