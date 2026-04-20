@@ -143,17 +143,18 @@ struct ContentView: View {
                     Text("Reset")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(store.hourOffset != 0 ? .white : .secondary.opacity(0.35))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
+                        .frame(width: 200)
+                        .padding(.vertical, 8)
                         .background(
-                            RoundedRectangle(cornerRadius: 8)
+                            Capsule()
                                 .fill(store.hourOffset != 0 ? Color.primary.opacity(0.25) : Color.primary.opacity(0.025))
                         )
                 }
                 .buttonStyle(.plain)
                 .disabled(store.hourOffset == 0)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 6)
+                .padding(.bottom, 0)
             }
             .navigationTitle("Time Zones")
             .navigationBarTitleDisplayMode(.inline)
